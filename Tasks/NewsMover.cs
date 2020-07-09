@@ -78,7 +78,7 @@ namespace Sitecore.Sharedsource.Tasks
         {
             get
             {
-                return !(string.IsNullOrEmpty(DateField) || string.IsNullOrEmpty(ArticleTemplate) || string.IsNullOrEmpty(YearTemplate) || string.IsNullOrEmpty(MonthTemplate) || string.IsNullOrEmpty(DayTemplate));
+                return !string.IsNullOrEmpty(DateField) || !string.IsNullOrEmpty(ArticleTemplate) || !string.IsNullOrEmpty(YearTemplate);
             }
         }
 
