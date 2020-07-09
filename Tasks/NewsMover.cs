@@ -148,7 +148,8 @@ namespace Sitecore.Sharedsource.Tasks
                 {
                     // create a new wrapper around the old config
                     var config = new TemplateConfiguration(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate);
-                    Templates.Add(config.Template.ID, config);
+                    if (config.IsValid())
+                        Templates.Add(config.Template.ID, config);
                 }
                 _legacyConfigLoaded = true;
             }

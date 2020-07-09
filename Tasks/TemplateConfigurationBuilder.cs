@@ -11,6 +11,7 @@
 
 namespace Sitecore.Sharedsource.Tasks
 {
+    using System;
     using System.Xml;
     using Sitecore.Data;
     using Sitecore.Data.Items;
@@ -66,10 +67,12 @@ namespace Sitecore.Sharedsource.Tasks
             SortOrder s = SortOrder.None;
             if (!string.IsNullOrEmpty(sort))
             {
-                s.TryParse(sort, true, out s);
+                Enum.TryParse(sort, true, out s);
             }
 
-            return new TemplateConfiguration(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+            var config = new TemplateConfiguration(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+
+            return config.IsValid() ? config : null;
         }
     }
 }

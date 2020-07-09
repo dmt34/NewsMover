@@ -113,5 +113,28 @@ namespace Sitecore.Sharedsource.Tasks
             // make sure we have a Month if we have a Day
             Sitecore.Diagnostics.Assert.IsFalse(MonthFolder == null && DayFolder != null, "dayTemplate without monthTemplate");
         }
+
+        public bool IsValid()
+        {
+            var msg = string.Empty;
+
+            if (_database.Templates[_template] == null)
+                msg += "Template does not exist: " + _template + "\n";
+
+            if (!string.IsNullOrEmpty(_yearTemplate) && _database.Templates[_yearTemplate] == null)
+                msg += "Year template does not exist: " + _yearTemplate + "\n";
+
+            if (!string.IsNullOrEmpty(_monthTemplate) && _database.Templates[_monthTemplate] == null)
+                msg += "Month template does not exist: " + _monthTemplate + "\n";
+
+            if (!string.IsNullOrEmpty(_dayTemplate) && _database.Templates[_dayTemplate] == null)
+                msg += "Day template does not exist: " + _dayTemplate + "\n";
+
+            if (string.IsNullOrEmpty(msg))
+                return true;
+
+            Sitecore.Diagnostics.Log.Warn(string.Format("Invalid NewsMover configuration. \n{0}", msg), this);
+            return false;
+        }
     }
 }
