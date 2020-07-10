@@ -15,6 +15,7 @@ namespace Sitecore.Sharedsource.Tasks
     using System.Xml;
     using Sitecore.Data;
     using Sitecore.Data.Items;
+    using Sitecore.Diagnostics;
     using Sitecore.Sharedsource.NewsMover;
 
     internal class TemplateConfigurationBuilder
@@ -70,9 +71,33 @@ namespace Sitecore.Sharedsource.Tasks
                 Enum.TryParse(sort, true, out s);
             }
 
-            var config = new TemplateConfiguration(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+            return Create(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+        }
 
-            return config.IsValid() ? config : null;
+
+        public static TemplateConfiguration Create(Database database, string template, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
+        {
+            var msg = string.Empty;
+
+            if (database.Templates[template] == null)
+                msg += "Template does not exist: " + template + "\n";
+
+            if (!string.IsNullOrEmpty(yearTemplate) && database.Templates[yearTemplate] == null)
+                msg += "Year template does not exist: " + yearTemplate + "\n";
+
+            if (!string.IsNullOrEmpty(monthTemplate) && database.Templates[monthTemplate] == null)
+                msg += "Month template does not exist: " + monthTemplate + "\n";
+
+            if (!string.IsNullOrEmpty(dayTemplate) && database.Templates[dayTemplate] == null)
+                msg += "Day template does not exist: " + dayTemplate + "\n";
+
+            if (!string.IsNullOrEmpty(msg))
+            {
+                Log.Warn(string.Format("Invalid NewsMover configuration. \n{0}", msg), typeof(TemplateConfigurationBuilder));
+                return null;
+            }
+
+            return new TemplateConfiguration(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, sort, yearFormat, monthFormat, dayFormat);
         }
     }
 }

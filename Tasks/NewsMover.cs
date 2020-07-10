@@ -17,6 +17,7 @@ namespace Sitecore.Sharedsource.Tasks
     using Sitecore.Configuration;
     using Sitecore.Data;
     using Sitecore.Data.Items;
+    using Sitecore.Diagnostics;
     using Sitecore.Pipelines;
     using Sitecore.Sharedsource.NewsMover;
     using Sitecore.Sharedsource.NewsMover.Pipelines;
@@ -79,7 +80,12 @@ namespace Sitecore.Sharedsource.Tasks
         {
             get
             {
-                return !string.IsNullOrEmpty(DateField) || !string.IsNullOrEmpty(ArticleTemplate) || !string.IsNullOrEmpty(YearTemplate);
+                var isLegacy = !string.IsNullOrEmpty(DateField) || !string.IsNullOrEmpty(ArticleTemplate) || !string.IsNullOrEmpty(YearTemplate);
+                if (isLegacy)
+                {
+                    Log.Info(string.Format("Legacy configurations used: [DateField:{0}][ArticleTemplate:{1}][YearTemplate:{2}]", DateField, ArticleTemplate, YearTemplate), this);
+                }
+                return isLegacy;
             }
         }
 
@@ -100,7 +106,7 @@ namespace Sitecore.Sharedsource.Tasks
         public virtual void AddTemplateConfiguration(XmlNode configNode)
         {
             var templateConfig = TemplateConfigurationBuilder.Create(SitecoreDatabase, configNode);
-            if (templateConfig != null)
+            if (templateConfig != null && !Templates.ContainsKey(templateConfig.Template.ID))
             {
                 Templates.Add(templateConfig.Template.ID, templateConfig);
             }
@@ -147,9 +153,11 @@ namespace Sitecore.Sharedsource.Tasks
             {
                 if (HasLegacyConfiguration)
                 {
+                    Log.Info("Loading legacy configuration for NewsMover", this);
+
                     // create a new wrapper around the old config
-                    var config = new TemplateConfiguration(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
-                    if (config.IsValid())
+                    var config = TemplateConfigurationBuilder.Create(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
+                    if (config != null && !Templates.ContainsKey(config.Template.ID))
                         Templates.Add(config.Template.ID, config);
                 }
                 _legacyConfigLoaded = true;

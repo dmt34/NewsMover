@@ -11,11 +11,8 @@
     <projectUrl>https://github.com/sitecorepm/NewsMover</projectUrl>
     <description>$description$</description>
     <releaseNotes>
-      1. Updated project to target .NET 4.5.
-      2. Added configuration validation. Configurations for templates that don't exist are not added. Instead a warning is logged.
-      3. Fixed a bug that kept legacy configurations from being recognized.
-      4. Make date formats and sort order configuration settings. 
-      5. Reverted child item sorting to be set explicitly with the sort order field on each child as opposed to the subitem sort field on the parent item.
+      1. Prevent adding duplicate configurations
+      2. Check that configured templates are valid before attempting to create folders
     </releaseNotes>
     <copyright>Copyright 2020</copyright>
     <tags>Siteore NewsMover</tags>
