@@ -20,8 +20,7 @@ namespace Sitecore.Sharedsource.Tasks
     public class TemplateConfiguration
     {
         private Database _database;
-        private string _template, _yearTemplate, _monthTemplate, _dayTemplate;
-        private string _yearFormat = "yyyy", _monthFormat = "MM", _dayFormat = "dd";
+        private string _template, _yearTemplate, _monthTemplate, _dayTemplate, _yearFormat, _monthFormat, _dayFormat;
         
         /// <summary>
         /// Gets the template.
@@ -66,7 +65,7 @@ namespace Sitecore.Sharedsource.Tasks
         /// <param name="yearFormat">The year format.</param>
         /// <param name="monthFormat">The month format.</param>
         /// <param name="dayFormat">The day format.</param>
-        internal TemplateConfiguration(Database database, string template, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort = SortOrder.None, string yearFormat = "yyyy", string monthFormat = "MM", string dayFormat = "dd")
+        internal TemplateConfiguration(Database database, string template, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
         {
             Sitecore.Diagnostics.Assert.IsNotNull(database, "Database");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(template, "Template");
@@ -78,9 +77,9 @@ namespace Sitecore.Sharedsource.Tasks
             _yearTemplate = yearTemplate;
             _monthTemplate = monthTemplate;
             _dayTemplate = dayTemplate;
-            _yearFormat = yearFormat;
-            _monthFormat = monthFormat;
-            _dayFormat = dayFormat;
+            _yearFormat = yearFormat ?? DefaultSettings.YearFormat;
+            _monthFormat = monthFormat ?? DefaultSettings.MonthFormat;
+            _dayFormat = dayFormat ?? DefaultSettings.DayFormat;
             DateField = dateField;
             SortOrder = sort;
 

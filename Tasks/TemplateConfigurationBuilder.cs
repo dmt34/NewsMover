@@ -32,7 +32,7 @@ namespace Sitecore.Sharedsource.Tasks
 
             string template = configNode.Attributes["id"].Value;
             string yearTemplate = configNode["YearTemplate"].InnerText;
-            string yearFormat = configNode["YearTemplate"].GetAttributeWithDefault("formatString", "yyyy");
+            string yearFormat = configNode["YearTemplate"].GetAttributeWithDefault("formatString", null);
             string monthTemplate = null, monthFormat = null;
             string dayTemplate = null, dayFormat = null;
             string dateField = configNode["DateField"].InnerText;
@@ -53,18 +53,18 @@ namespace Sitecore.Sharedsource.Tasks
             if (configNode["MonthTemplate"] != null)
             {
                 monthTemplate = configNode["MonthTemplate"].InnerText;
-                monthFormat = configNode["MonthTemplate"].GetAttributeWithDefault("formatString", "MM");
+                monthFormat = configNode["MonthTemplate"].GetAttributeWithDefault("formatString", null);
             }
 
             if (configNode["DayTemplate"] != null)
             {
                 dayTemplate = configNode["DayTemplate"].InnerText;
-                dayFormat = configNode["DayTemplate"].GetAttributeWithDefault("formatString", "dd");
+                dayFormat = configNode["DayTemplate"].GetAttributeWithDefault("formatString", null);
             }
 
 
             string sort = configNode.GetAttributeWithDefault("sort", null);
-            SortOrder s = SortOrder.None;
+            SortOrder s = DefaultSettings.SortOrder;
             if (!string.IsNullOrEmpty(sort))
             {
                 Enum.TryParse(sort, true, out s);

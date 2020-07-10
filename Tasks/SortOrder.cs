@@ -11,13 +11,13 @@
 
 namespace Sitecore.Sharedsource.Tasks
 {
+    using Sitecore.Configuration;
+    using System;
     using System.ComponentModel;
 
     public enum SortOrder
     {
-        [Description("{781247D2-9785-400F-8935-C818EC757967}")] // default
         Ascending,
-        [Description("{C3E3F0E3-0162-4F1F-AB3E-40348E371A3F}")] // reverse
         Descending,
         None
     }

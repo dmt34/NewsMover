@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultSettings.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Pipelines\IMoveCompletedPipelineProcessor.cs" />
     <Compile Include="Pipelines\RefreshContentTree.cs">

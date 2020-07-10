@@ -14,6 +14,7 @@ namespace Sitecore.Sharedsource.Tasks
     using System;
     using System.Collections.Generic;
     using System.Xml;
+    using Sitecore.Configuration;
     using Sitecore.Data;
     using Sitecore.Data.Items;
     using Sitecore.Pipelines;
@@ -147,7 +148,7 @@ namespace Sitecore.Sharedsource.Tasks
                 if (HasLegacyConfiguration)
                 {
                     // create a new wrapper around the old config
-                    var config = new TemplateConfiguration(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate);
+                    var config = new TemplateConfiguration(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
                     if (config.IsValid())
                         Templates.Add(config.Template.ID, config);
                 }
@@ -204,16 +205,16 @@ namespace Sitecore.Sharedsource.Tasks
             Item root = GetRoot(item, config);
 
             // get/create the year folder
-            root = GetOrCreateChild(root, config.YearFolder.Template, config.YearFolder.GetName(articleDate), config.SortOrder);
+            root = GetOrCreateChild(root, config.YearFolder.Template, config.YearFolder.GetName(articleDate), config.SortOrder, articleDate.Year);
 
             // get/create any month -> day structure we need
             if (config.MonthFolder != null)
             {
-                root = GetOrCreateChild(root, config.MonthFolder.Template, config.MonthFolder.GetName(articleDate), config.SortOrder);
+                root = GetOrCreateChild(root, config.MonthFolder.Template, config.MonthFolder.GetName(articleDate), config.SortOrder, articleDate.Month);
 
                 if (config.DayFolder != null)
                 {
-                    root = GetOrCreateChild(root, config.DayFolder.Template, config.DayFolder.GetName(articleDate), config.SortOrder);
+                    root = GetOrCreateChild(root, config.DayFolder.Template, config.DayFolder.GetName(articleDate), config.SortOrder, articleDate.Day);
                 }
             }
 
@@ -261,15 +262,6 @@ namespace Sitecore.Sharedsource.Tasks
                 parent = parent.Parent;
             }
 
-            // enforce that sub-item sorting is set
-            if (config.SortOrder != SortOrder.None && parent[FieldIDs.SubitemsSorting] != config.SortOrder.ToDescription())
-            {
-                using (new Sitecore.Data.Items.EditContext(parent))
-                {
-                    parent.Fields[FieldIDs.SubitemsSorting].Value = config.SortOrder.ToDescription();
-                }
-            }
-
             return parent;
         }
 
@@ -280,7 +272,7 @@ namespace Sitecore.Sharedsource.Tasks
         /// <param name="childName">Name of the child.</param>
         /// <param name="template">The template.</param>
         /// <returns></returns>
-        protected Item GetOrCreateChild(Item parent, TemplateItem template, string childName, SortOrder subItemSorting)
+        protected Item GetOrCreateChild(Item parent, TemplateItem template, string childName, SortOrder sortOrder, int sortIndex)
         {
             Item child = parent.Children[childName];
             if (child == null)
@@ -288,12 +280,17 @@ namespace Sitecore.Sharedsource.Tasks
                 child = parent.Add(childName, template);
             }
 
+            if (sortOrder == SortOrder.Descending)
+                sortIndex = sortIndex * -1;
+
+            var sortValue = sortIndex.ToString();
+
             // enforce that sub-item sorting is set
-            if (subItemSorting != SortOrder.None && child[FieldIDs.SubitemsSorting] != subItemSorting.ToDescription())
+            if (child[FieldIDs.Sortorder] != sortValue)
             {
                 using (new Sitecore.Data.Items.EditContext(child))
                 {
-                    child.Fields[FieldIDs.SubitemsSorting].Value = subItemSorting.ToDescription();
+                    child.Fields[FieldIDs.Sortorder].Value = sortValue;
                 }
             }
 

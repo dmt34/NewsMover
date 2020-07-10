@@ -92,32 +92,5 @@ namespace Sitecore.Sharedsource.NewsMover
             return en.ToString();
         }
 
-        /// <summary>
-        /// 3.5 extension method for .net 4's Enum.TryParse
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="theEnum">The enum.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
-        public static bool TryParse<T>(this T theEnum, string value, bool ignoreCase, out T result)
-        {
-            result = theEnum;
-            foreach (string item in Enum.GetNames(typeof(T)))
-            {
-                if (string.Equals(item, value, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-                {
-                    result = (T)Enum.Parse(typeof(T), value.ToString());
-                    return true;
-                }
-            }
-
-            if (Enum.IsDefined(typeof(T), System.Convert.ChangeType(value, (Enum.GetUnderlyingType(typeof(T))))))
-            {
-                result = (T)Enum.Parse(typeof(T), value.ToString());
-                return true;
-            }
-            return false;
-        }
     }
 }
