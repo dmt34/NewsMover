@@ -5,12 +5,20 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sitecore.Sharedsource.NewsMover")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("SitecorePM.Sharedsource.NewsMover")]
+[assembly: AssemblyDescription(@"Module to enable dynamic folder creation for date based items (such as news articles) in a Sitecore tree. Originally created by John West. Jimmie Overby then improved the configuration model among other changes and uploaded it to GitHub. Finally, I forked it to fix some issues as noted in release notes.
+
+    https://community.sitecore.net/technical_blogs/b/sitecorejohn_blog/posts/sitecore-shared-source-newsmover-organizes-news-articles
+
+    https://marketplace.sitecore.net/en/Modules/News_mover.aspx
+
+    https://github.com/JimmieOverby/NewsMover
+
+    https://github.com/sitecorepm/NewsMover")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("John West, Jimmie Overby, Paul Martin")]
 [assembly: AssemblyProduct("Sitecore.Sharedsource.NewsMover")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCopyright("Copyright 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +40,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.1.0.0")]
