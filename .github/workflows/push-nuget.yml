@@ -29,7 +29,7 @@ jobs:
         PACKAGE_NAME: SitecorePM.Sharedsource.NewsMover
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
         VERSION_FILE_PATH: Properties\AssemblyInfo.cs
-        VERSION_REGEX: \[assembly:\sAssemblyVersion\(".*"\)\]
+        VERSION_REGEX: \[assembly:\sAssemblyVersion\("(.*)"\)\]
 
     # Runs a single command using the runners shell
     #- name: Run a one-line script
