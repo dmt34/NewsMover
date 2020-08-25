@@ -26,6 +26,7 @@ jobs:
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
         PROJECT_FILE_PATH: Sitecore.Sharedsource.NewsMover.csproj
+        PACKAGE_NAME: SitecorePM.Sharedsource.NewsMover
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
         VERSION_FILE_PATH: Properties\AssemblyInfo.cs
         VERSION_REGEX: \[assembly:\sAssemblyVersion\(".*"\)\]
