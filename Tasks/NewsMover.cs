@@ -210,6 +210,17 @@ namespace Sitecore.Sharedsource.Tasks
         /// <param name="articleDate">The article date.</param>
         protected void OrganizeItem(Item item, TemplateConfiguration config, DateTime articleDate)
         {
+            // Assign each news item an explicit sortorder
+            var sign = config.SortOrder == SortOrder.Descending ? "-" : string.Empty;
+            string text = sign + DateUtil.ToIsoDate(articleDate).Substring(4).Replace("T", string.Empty);
+            if (item[FieldIDs.Sortorder] != text)
+            {
+                using (new EditContext(item))
+                {
+                    item[FieldIDs.Sortorder] = text;
+                }
+            }
+
             Item root = GetRoot(item, config);
 
             // get/create the year folder
@@ -227,24 +238,24 @@ namespace Sitecore.Sharedsource.Tasks
             }
 
             // if the item is already where it should be, then bail out
-            if (string.Equals(item.Parent.Paths.FullPath, root.Paths.FullPath, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(item.Parent.Paths.FullPath, root.Paths.FullPath, StringComparison.OrdinalIgnoreCase))
             {
-                return;
-            }
 
-            // save the original location so we can clean up 
-            Item originalParent = item.Parent;
+                // save the original location so we can clean up 
+                Item originalParent = item.Parent;
 
-            // move the item to the proper location
-            item.MoveTo(root);
+                // move the item to the proper location
+                item.MoveTo(root);
 
-            // delete the original parent if there are no children.
-            // keep walking up while we are a year/month/day
-            while ((!originalParent.HasChildren) && IsItemYearMonthOrDay(originalParent, config))
-            {
-                Item parent = originalParent.Parent;
-                originalParent.Delete();
-                originalParent = parent;
+                // delete the original parent if there are no children.
+                // keep walking up while we are a year/month/day
+                while ((!originalParent.HasChildren) && IsItemYearMonthOrDay(originalParent, config))
+                {
+                    Item parent = originalParent.Parent;
+                    originalParent.Delete();
+                    originalParent = parent;
+                }
+
             }
 
             if ((!Sitecore.Context.IsBackgroundThread) && Sitecore.Context.ClientPage.IsEvent)

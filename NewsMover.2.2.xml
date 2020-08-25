@@ -1,0 +1,53 @@
+<project>
+  <Metadata>
+    <metadata>
+      <PackageName>NewsMover</PackageName>
+      <Author>Sitecore Shared Source</Author>
+      <Version>2.2</Version>
+      <Revision />
+      <License>&lt;a href="http://sdn.sitecore.net/resources/shared%20source/shared%20source%20license.aspx"&gt;http://sdn.sitecore.net/resources/shared%20source/shared%20source%20license.aspx&lt;/a&gt;</License>
+      <Comment />
+      <Attributes />
+      <Readme>https://github.com/sitecorepm/NewsMover</Readme>
+      <Publisher />
+      <PostStep />
+      <PackageID />
+    </metadata>
+  </Metadata>
+  <SaveProject>True</SaveProject>
+  <Sources>
+    <xfiles>
+      <Entries>
+        <x-item>/App_Config/Include/NewsMover.config</x-item>
+        <x-item>/bin/Sitecore.Sharedsource.NewsMover.dll</x-item>
+        <x-item>/bin/Sitecore.Sharedsource.NewsMover.pdb</x-item>
+      </Entries>
+      <Converter>
+        <FileToEntryConverter>
+          <Root>/</Root>
+          <Transforms>
+            <InstallerConfigurationTransform>
+              <Options>
+                <BehaviourOptions>
+                  <ItemMode>Undefined</ItemMode>
+                  <ItemMergeMode>Undefined</ItemMergeMode>
+                </BehaviourOptions>
+              </Options>
+            </InstallerConfigurationTransform>
+          </Transforms>
+        </FileToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>NewsMoverFiles</Name>
+    </xfiles>
+  </Sources>
+  <Converter>
+    <TrivialConverter>
+      <Transforms />
+    </TrivialConverter>
+  </Converter>
+  <Include />
+  <Exclude />
+  <Name />
+</project>
