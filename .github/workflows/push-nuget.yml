@@ -19,20 +19,43 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: Get version
+      id: get_version
+      uses: jasondavis303/assembly-info-version@v1.0.1
+      with:
+        AI_PATH: Properties/AssemblyInfo.cs
+
+    - name: Check version
+      id: check_version
+      run: |
+        $assemblyVersion = "${{ steps.get_version.outputs.ASSEMBLY_VERSION }}"
+
+        # Normalize version
+        $arr = $assemblyVersion.Split(".")
+        while ($arr.Length -lt 3) { $arr += "0" }
+        $v = $arr -join "."
+
+        # Check if already pushed to Nuget
+        $versionsUrl = "https://api.nuget.org/v3-flatcontainer/SitecorePM.Sharedsource.NewsMover/index.json"
+        $versionExists = (Invoke-RestMethod -Uri $versionsUrl).versions.Contains($v)
+
+        echo "::set-output name=version_exists::$versionExists"
+        
+
     - name: Setup Nuget.exe
+      if: steps.check_version.outputs.version_exists == 'false'
       uses: warrenbuckley/Setup-Nuget@v1
 
     - name: Setup MSBuild.exe
+      if: steps.check_version.outputs.version_exists == 'false'
       uses: warrenbuckley/Setup-MSBuild@v1
   
-    - name: Build
-      run: msbuild Sitecore.Sharedsource.NewsMover.sln /p:Configuration=Release
-      
-    - name: Nuget Pack
-      run: nuget pack Sitecore.Sharedsource.NewsMover.csproj -p Configuration=Release
-    
-    - name: Nuget Push
-      run: nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}" -Source "https://api.nuget.org/v3/index.json"
+    - name: Build, Package, Push to Nuget
+      if: steps.check_version.outputs.version_exists == 'false'
+      run: |
+        msbuild Sitecore.Sharedsource.NewsMover.sln /p:Configuration=Release
+        nuget pack Sitecore.Sharedsource.NewsMover.csproj -p Configuration=Release
+        nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}" -Source "https://api.nuget.org/v3/index.json"
       
     # Runs a single command using the runners shell
     #- name: Run a one-line script
