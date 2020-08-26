@@ -29,7 +29,7 @@ jobs:
       run: msbuild Sitecore.Sharedsource.NewsMover.sln /p:Configuration=Release
       
     - name: Nuget Pack
-      run: nuget pack Sitecore.Sharedsource.NewsMover.csproj
+      run: nuget pack Sitecore.Sharedsource.NewsMover.csproj -p Configuration=Release
     
     - name: Rename Package
       run: |
