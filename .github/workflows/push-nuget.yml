@@ -37,7 +37,7 @@ jobs:
         Rename-Item $nupkg $nupkg.Name.Replace("Sitecore.", "SitecorePM.")
     
     - name: Nuget Push
-      run: nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}"
+      run: nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}" -Source "https://api.nuget.org/v3/index.json"
       
     # Runs a single command using the runners shell
     #- name: Run a one-line script
