@@ -31,11 +31,6 @@ jobs:
     - name: Nuget Pack
       run: nuget pack Sitecore.Sharedsource.NewsMover.csproj -p Configuration=Release
     
-    - name: Rename Package
-      run: |
-        $nupkg = (dir *.nupkg) | select -First 1
-        Rename-Item $nupkg $nupkg.Name.Replace("Sitecore.", "SitecorePM.")
-    
     - name: Nuget Push
       run: nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}" -Source "https://api.nuget.org/v3/index.json"
       
