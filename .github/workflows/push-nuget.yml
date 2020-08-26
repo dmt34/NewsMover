@@ -19,18 +19,26 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Package & publish to Nuget
-    - name: Publish NuGet
-      # You may pin to the exact commit or the version.
-      # uses: brandedoutcast/publish-nuget@c12b8546b67672ee38ac87bea491ac94a587f7cc
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: Sitecore.Sharedsource.NewsMover.csproj
-        PACKAGE_NAME: SitecorePM.Sharedsource.NewsMover
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        VERSION_FILE_PATH: Properties\AssemblyInfo.cs
-        VERSION_REGEX: \[assembly:\sAssemblyVersion\("(.*)"\)\]
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
 
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+  
+    - name: Build
+      run: msbuild Sitecore.Sharedsource.NewsMover.sln /p:Configuration=Release
+      
+    - name: Nuget Pack
+      run: nuget pack Sitecore.Sharedsource.NewsMover.csproj
+    
+    - name: Rename Package
+      run: |
+        $nupkg = (dir *.nupkg) | select -First 1
+        Rename-Item $nupkg $nupkg.Name.Replace("Sitecore.", "SitecorePM.")
+    
+    - name: Nuget Push
+      run: nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}"
+      
     # Runs a single command using the runners shell
     #- name: Run a one-line script
     #  run: echo Hello, world!
