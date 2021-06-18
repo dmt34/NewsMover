@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\BaseMoverConfiguration.cs" />
+    <Compile Include="Configuration\AlphaMoverConfiguration.cs" />
+    <Compile Include="Configuration\IMoverConfiguration.cs" />
     <Compile Include="DefaultSettings.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Pipelines\IMoveCompletedPipelineProcessor.cs" />
@@ -53,11 +56,16 @@
     </Compile>
     <Compile Include="Pipelines\MoveCompletedArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\Folder.cs" />
-    <Compile Include="Tasks\NewsMover.cs" />
-    <Compile Include="Tasks\SortOrder.cs" />
-    <Compile Include="Tasks\TemplateConfiguration.cs" />
-    <Compile Include="Tasks\TemplateConfigurationBuilder.cs" />
+    <Compile Include="Sorters\AlphaSorter.cs" />
+    <Compile Include="Sorters\BaseSorter.cs" />
+    <Compile Include="Sorters\DateSorter.cs" />
+    <Compile Include="Sorters\ISorter.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Folder.cs" />
+    <Compile Include="EventHandler.cs" />
+    <Compile Include="SortOrder.cs" />
+    <Compile Include="Configuration\DateMoverConfiguration.cs" />
+    <Compile Include="Configuration\MoverConfigurationBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App_Config\Include\NewsMover.config" />

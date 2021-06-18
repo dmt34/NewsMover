@@ -6,7 +6,7 @@
 // <license>
 // http://sdn.sitecore.net/Resources/Shared%20Source/Shared%20Source%20License.aspx
 // </license>
-// <url>http://trac.sitecore.net/NewsMover/</url>
+// <url>https://github.com/JimmieOverby/NewsMover</url>
 //-------------------------------------------------------------------------------------------------
 
 using System;
