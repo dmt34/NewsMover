@@ -20,7 +20,6 @@
       <Entries>
         <x-item>/App_Config/Include/NewsMover.config</x-item>
         <x-item>/bin/Sitecore.Sharedsource.NewsMover.dll</x-item>
-        <x-item>/bin/Sitecore.Sharedsource.NewsMover.pdb</x-item>
       </Entries>
       <Converter>
         <FileToEntryConverter>
