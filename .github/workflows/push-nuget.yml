@@ -19,16 +19,12 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Get version
-      id: get_version
-      uses: jasondavis303/assembly-info-version@v1.0.1
-      with:
-        AI_PATH: Properties/AssemblyInfo.cs
-
     - name: Check version
       id: check_version
       run: |
-        $assemblyVersion = "${{ steps.get_version.outputs.ASSEMBLY_VERSION }}"
+        $versionLine = gc .\Properties\AssemblyInfo.cs | ? { $_ -like "*AssemblyFileVersion*" }
+        $versionLine -match "AssemblyFileVersion\(`"(?<version>[\d\.]+)`"\)" | Out-Null
+        $assemblyVersion = $Matches["version"]
 
         # Normalize version
         $arr = $assemblyVersion.Split(".")
@@ -44,18 +40,21 @@ jobs:
 
     - name: Setup Nuget.exe
       if: steps.check_version.outputs.version_exists == 'false'
-      uses: warrenbuckley/Setup-Nuget@v1
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+        nuget-version: 'latest'
 
     - name: Setup MSBuild.exe
       if: steps.check_version.outputs.version_exists == 'false'
-      uses: warrenbuckley/Setup-MSBuild@v1
+      uses: microsoft/setup-msbuild@v1.0.2
   
     - name: Build, Package, Push to Nuget
       if: steps.check_version.outputs.version_exists == 'false'
       run: |
         msbuild Sitecore.Sharedsource.NewsMover.sln /p:Configuration=Release
         nuget pack Sitecore.Sharedsource.NewsMover.csproj -p Configuration=Release
-        nuget push *.nupkg -ApiKey "${{secrets.NUGET_API_KEY}}" -Source "https://api.nuget.org/v3/index.json"
+        nuget push *.nupkg -Source "https://api.nuget.org/v3/index.json"
       
     # Runs a single command using the runners shell
     #- name: Run a one-line script
