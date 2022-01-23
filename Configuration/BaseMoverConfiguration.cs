@@ -18,20 +18,44 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
 
     public abstract class BaseMoverConfiguration : IMoverConfiguration
     {
-        public BaseMoverConfiguration(Database database, string template, SortOrder sort)
+        public BaseMoverConfiguration(Database database, string template, string branch, SortOrder sort)
         {
             Sitecore.Diagnostics.Assert.IsNotNull(database, "Database");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(template, "Template");
 
             Database = database;
-            Template = Database.Templates[template];
+            ItemKey = GetItemKey(database, template, branch);
             SortOrder = sort;
         }
 
         protected Database Database { get; set; }
-
-        public TemplateItem Template { get; set; }
-
+        public string ItemKey { get; set; }
         public SortOrder SortOrder { get; set; }
+
+
+        private string GetItemKey(Database db, string templatePath, string branchPath)
+        {
+            string key = string.Empty;
+
+            TemplateItem ti = db.Templates[templatePath];
+            if (ti == null)
+                Sitecore.Diagnostics.Log.Warn($"bad template path={templatePath}...", this);
+            else
+                key = ti.ID.ToShortID().ToString().ToLower();
+
+
+            if (!string.IsNullOrEmpty(branchPath))
+            {
+                BranchItem bi = db.Branches[branchPath];
+                if (bi == null)
+                    Sitecore.Diagnostics.Log.Warn($"bad branch path={branchPath}...", this);
+                else
+                    key += bi.ID.ToShortID().ToString().ToLower();
+            }
+
+            return key;
+        }
     }
+
+
 }

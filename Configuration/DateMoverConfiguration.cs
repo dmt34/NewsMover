@@ -45,7 +45,8 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         /// Initializes a new instance of the <see cref="TemplateConfiguration"/> class.
         /// </summary>
         /// <param name="database">The database.</param>
-        /// <param name="template">The template.</param>
+        /// <param name="template">The target item template.</param>
+        /// <param name="branch">The target item branch template.</param>
         /// <param name="dateField">The date field.</param>
         /// <param name="yearTemplate">The year template.</param>
         /// <param name="monthTemplate">The month template.</param>
@@ -54,8 +55,8 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         /// <param name="yearFormat">The year format.</param>
         /// <param name="monthFormat">The month format.</param>
         /// <param name="dayFormat">The day format.</param>
-        internal DateMoverConfiguration(Database database, string template, SortOrder sort, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, string yearFormat = null, string monthFormat = null, string dayFormat = null)
-            : base (database, template, sort)
+        internal DateMoverConfiguration(Database database, string template, string branch, SortOrder sort, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, string yearFormat = null, string monthFormat = null, string dayFormat = null)
+            : base (database, template, branch, sort)
         {
 
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(dateField, "DateField");

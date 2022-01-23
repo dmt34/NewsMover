@@ -45,6 +45,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         private static IMoverConfiguration CreateAlphaBased(Database database, XmlNode configNode)
         {
             string template = configNode.Attributes["id"].Value;
+            string branch = configNode.Attributes["branch"]?.Value ?? string.Empty;
             string folderTemplate = configNode["FolderTemplate"].InnerText;
 
             SortOrder s = GetSortOrder(configNode);
@@ -59,12 +60,13 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
             }
 
 
-            return new AlphaMoverConfiguration(database, template, s, folderTemplate, sortFields);
+            return new AlphaMoverConfiguration(database, template, branch, s, folderTemplate, sortFields);
         }
 
         private static DateMoverConfiguration CreateDateBased(Database database, XmlNode configNode)
         {
             string template = configNode.Attributes["id"].Value;
+            string branch = configNode.Attributes["branch"]?.Value ?? string.Empty;
             string yearTemplate = configNode["YearTemplate"].InnerText;
             string yearFormat = configNode["YearTemplate"].GetAttributeWithDefault("formatString", null);
             string monthTemplate = null, monthFormat = null;
@@ -98,7 +100,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
 
             SortOrder s = GetSortOrder(configNode);
 
-            return CreateDateBased(database, template, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+            return CreateDateBased(database, template, branch, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
         }
 
         private static SortOrder GetSortOrder(XmlNode configNode)
@@ -113,7 +115,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
             return s;
         }
 
-        public static DateMoverConfiguration CreateDateBased(Database database, string template, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
+        public static DateMoverConfiguration CreateDateBased(Database database, string template, string branch, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
         {
             var msg = string.Empty;
 
@@ -135,7 +137,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
                 return null;
             }
 
-            return new DateMoverConfiguration(database, template, sort, dateField, yearTemplate, monthTemplate, dayTemplate, yearFormat, monthFormat, dayFormat);
+            return new DateMoverConfiguration(database, template, branch, sort, dateField, yearTemplate, monthTemplate, dayTemplate, yearFormat, monthFormat, dayFormat);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
 {
     public class AlphaSorter : BaseSorter
     {
-        public AlphaSorter(Dictionary<ID, IMoverConfiguration> templates) : base(templates) { }
+        public AlphaSorter(Dictionary<string, IMoverConfiguration> templates) : base(templates) { }
 
 
         protected override Item CreateFolders(Item item, IMoverConfiguration config)
@@ -47,7 +47,7 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
         {
             Item parent = item.Parent;
 
-            while (Templates.ContainsKey(parent.TemplateID) || IsMoverFolderItem(parent, config))
+            while (Templates.ContainsKey(parent.ItemKey()) || IsMoverFolderItem(parent, config))
             {
                 parent = parent.Parent;
             }

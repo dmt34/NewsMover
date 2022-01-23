@@ -16,6 +16,6 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
     public interface IMoverConfiguration
     {
         SortOrder SortOrder { get; }
-        TemplateItem Template { get; }
+        string ItemKey { get; }
     }
 }

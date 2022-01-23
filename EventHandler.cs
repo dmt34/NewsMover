@@ -90,11 +90,11 @@ namespace Sitecore.Sharedsource.NewsMover
         /// <summary>
         /// Gets the templates to be organized.
         /// </summary>
-        protected Dictionary<ID, IMoverConfiguration> Templates { get; private set; }
+        protected Dictionary<string, IMoverConfiguration> Templates { get; private set; }
 
         public EventHandler()
         {
-            Templates = new Dictionary<ID, IMoverConfiguration>();
+            Templates = new Dictionary<string, IMoverConfiguration>();
         }
 
         /// <summary>
@@ -104,9 +104,9 @@ namespace Sitecore.Sharedsource.NewsMover
         public virtual void AddTemplateConfiguration(XmlNode configNode)
         {
             var templateConfig = MoverConfigurationBuilder.Create(SitecoreDatabase, configNode);
-            if (templateConfig != null && !Templates.ContainsKey(templateConfig.Template.ID))
+            if (templateConfig != null && !Templates.ContainsKey(templateConfig.ItemKey))
             {
-                Templates.Add(templateConfig.Template.ID, templateConfig);
+                Templates.Add(templateConfig.ItemKey, templateConfig);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Sitecore.Sharedsource.NewsMover
             Item item = GetItem(args);
 
             if (!string.Equals(item.Database.Name, Database, StringComparison.OrdinalIgnoreCase) || // if we are NOT in the supported database
-                !Templates.ContainsKey(item.TemplateID) ||  // if the template is NOT supported
+                !Templates.ContainsKey(item.ItemKey()) ||  // if the template is NOT supported
                 item.IsStandardValues() || // if we are the standard value
                 _inProcess.Contains(item.ID))
             {
@@ -131,7 +131,7 @@ namespace Sitecore.Sharedsource.NewsMover
 
             _inProcess.Add(item.ID);
 
-            var config = Templates[item.TemplateID];
+            var config = Templates[item.ItemKey()];
             var s = GetSorter(item, config);
             s.OrganizeItem(item, config);
 
@@ -168,9 +168,10 @@ namespace Sitecore.Sharedsource.NewsMover
                     Log.Info("Loading legacy configuration for NewsMover", this);
 
                     // create a new wrapper around the old config
-                    var config = MoverConfigurationBuilder.CreateDateBased(SitecoreDatabase, ArticleTemplate, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
-                    if (config != null && !Templates.ContainsKey(config.Template.ID))
-                        Templates.Add(config.Template.ID, config);
+                    string branch = string.Empty;
+                    var config = MoverConfigurationBuilder.CreateDateBased(SitecoreDatabase, ArticleTemplate, branch, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
+                    if (config != null && !Templates.ContainsKey(config.ItemKey))
+                        Templates.Add(config.ItemKey, config);
                 }
                 _legacyConfigLoaded = true;
             }

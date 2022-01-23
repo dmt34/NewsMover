@@ -68,6 +68,29 @@ namespace Sitecore.Sharedsource.NewsMover
 
             return isStandardValue;
         }
+
+        /// <summary>
+        ///   Produces a dictionary key for checking managed items.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        /// <returns>
+        ///   templateid + [optional] branchid
+        /// </returns>
+        /// <remarks>
+        ///   compare with output of BaseMoverConfiguration.GetItemKey()
+        /// </remarks>
+        public static string ItemKey(this Item item)
+        {
+            if (item == null)
+                return "";
+
+            string key = item.TemplateID.ToShortID().ToString().ToLower();
+            
+            if (!Sitecore.Data.ID.IsNullOrEmpty(item.BranchId))
+                key += item.BranchId.ToShortID().ToString().ToLower();
+
+            return key;
+        }
     }
 
     internal static class EnumExtensions

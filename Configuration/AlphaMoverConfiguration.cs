@@ -23,12 +23,13 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
 
         public string[] SortFields { get; private set; }
 
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateConfiguration"/> class.
         /// </summary>
         /// <param name="database">The database.</param>
-        /// <param name="template">The template.</param>
+        /// <param name="template">The target item template.</param>
+        /// <param name="branch">The target item branch template.</param>
         /// <param name="dateField">The date field.</param>
         /// <param name="yearTemplate">The year template.</param>
         /// <param name="monthTemplate">The month template.</param>
@@ -37,8 +38,8 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         /// <param name="yearFormat">The year format.</param>
         /// <param name="monthFormat">The month format.</param>
         /// <param name="dayFormat">The day format.</param>
-        internal AlphaMoverConfiguration(Database database, string template, SortOrder sort, string folderTemplate, string[] sortFields)
-            : base (database, template, sort)
+        internal AlphaMoverConfiguration(Database database, string template, string branch, SortOrder sort, string folderTemplate, string[] sortFields)
+            : base (database, template, branch, sort)
         {
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(folderTemplate, "FolderTemplate");
 

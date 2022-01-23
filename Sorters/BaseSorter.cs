@@ -24,9 +24,9 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
 
     public abstract class BaseSorter : ISorter
     {
-        protected Dictionary<ID, IMoverConfiguration> Templates { get; private set; }
+        protected Dictionary<string, IMoverConfiguration> Templates { get; private set; }
 
-        public BaseSorter(Dictionary<ID, IMoverConfiguration> templates)
+        public BaseSorter(Dictionary<string, IMoverConfiguration> templates)
         {
             Templates = templates;
         }

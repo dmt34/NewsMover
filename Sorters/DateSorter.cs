@@ -10,7 +10,7 @@
 
     public class DateSorter : BaseSorter
     {
-        public DateSorter(Dictionary<ID, IMoverConfiguration> templates) : base(templates) { }
+        public DateSorter(Dictionary<string, IMoverConfiguration> templates) : base(templates) { }
 
         /// <summary>
         /// Initializes the date field to the current date if there is no value.
@@ -88,7 +88,7 @@
         {
             Item parent = item.Parent;
 
-            while (Templates.ContainsKey(parent.TemplateID) || IsMoverFolderItem(parent, config))
+            while (Templates.ContainsKey(parent.ItemKey()) || IsMoverFolderItem(parent, config))
             {
                 parent = parent.Parent;
             }
