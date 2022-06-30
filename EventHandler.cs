@@ -23,7 +23,7 @@ namespace Sitecore.Sharedsource.NewsMover
     public class EventHandler
     {
         private static readonly SynchronizedCollection<ID> _inProcess = new SynchronizedCollection<ID>();
-        private bool _legacyConfigLoaded = false;
+        //private bool _legacyConfigLoaded = false;
         private string _databaseName = "master";
         private Database _database = null;
 
@@ -53,37 +53,6 @@ namespace Sitecore.Sharedsource.NewsMover
                     Sitecore.Diagnostics.Assert.IsNotNull(_database, this.Database);
                 }
                 return _database;
-            }
-        }
-
-        #region Legacy Config Properties
-        public string YearTemplate { get; set; }
-
-        public string MonthTemplate { get; set; }
-
-        public string DayTemplate { get; set; }
-
-        public string DateField { get; set; }
-
-        public string ArticleTemplate { get; set; }
-        #endregion
-
-        /// <summary>
-        /// Gets a value indicating whether this instance has legacy configuration.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if this instance has legacy configuration; otherwise, <c>false</c>.
-        /// </value>
-        protected bool HasLegacyConfiguration
-        {
-            get
-            {
-                var isLegacy = !string.IsNullOrEmpty(DateField) || !string.IsNullOrEmpty(ArticleTemplate) || !string.IsNullOrEmpty(YearTemplate);
-                if (isLegacy)
-                {
-                    Log.Info(string.Format("Legacy configurations used: [DateField:{0}][ArticleTemplate:{1}][YearTemplate:{2}]", DateField, ArticleTemplate, YearTemplate), this);
-                }
-                return isLegacy;
             }
         }
 
@@ -117,12 +86,12 @@ namespace Sitecore.Sharedsource.NewsMover
         /// <param name="args">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         public void OnItemSaved(object sender, EventArgs args)
         {
-            LoadLegacySettings();
+            //LoadLegacySettings();
 
             Item item = GetItem(args);
 
             if (!string.Equals(item.Database.Name, Database, StringComparison.OrdinalIgnoreCase) || // if we are NOT in the supported database
-                !Templates.ContainsKey(item.ItemKey()) ||  // if the template is NOT supported
+                !Templates.ContainsKey(item.ItemKey()) ||  // if the target item template is NOT supported
                 item.IsStandardValues() || // if we are the standard value
                 _inProcess.Contains(item.ID))
             {
@@ -148,34 +117,7 @@ namespace Sitecore.Sharedsource.NewsMover
             {
                 return new AlphaSorter(Templates);
             }
-        }
-
-        /// <summary>
-        /// Loads the legacy settings.
-        /// </summary>
-        protected void LoadLegacySettings()
-        {
-            // The original version of this module supported a single template.
-            // we don't want to break this so lets convert the legacy settings into 
-            // our new TemplateConfiguration.
-            // we only want to do this once since this class is instantiated once by Sitecore 
-            // and kept around for all usages (i.e. some sort of singleton)
-
-            if (!_legacyConfigLoaded)
-            {
-                if (HasLegacyConfiguration)
-                {
-                    Log.Info("Loading legacy configuration for NewsMover", this);
-
-                    // create a new wrapper around the old config
-                    string branch = string.Empty;
-                    var config = MoverConfigurationBuilder.CreateDateBased(SitecoreDatabase, ArticleTemplate, branch, DateField, YearTemplate, MonthTemplate, DayTemplate, DefaultSettings.SortOrder);
-                    if (config != null && !Templates.ContainsKey(config.ItemKey))
-                        Templates.Add(config.ItemKey, config);
-                }
-                _legacyConfigLoaded = true;
-            }
-        }
+        }  
 
         /// <summary>
         /// Gets the item from the event args.

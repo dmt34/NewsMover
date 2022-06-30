@@ -14,6 +14,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
     using System;
     using System.Linq;
     using System.Xml;
+    using System.Text.RegularExpressions;
     using Sitecore.Data;
     using Sitecore.Data.Items;
     using Sitecore.Diagnostics;
@@ -44,13 +45,14 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
 
         private static IMoverConfiguration CreateAlphaBased(Database database, XmlNode configNode)
         {
-            string template = configNode.Attributes["id"].Value;
-            string branch = configNode.Attributes["branch"]?.Value ?? string.Empty;
+            string itemKey = configNode.Attributes["itemKey"].Value;
+            string folderKey = configNode.Attributes["folderKey"].Value;
             string folderTemplate = configNode["FolderTemplate"].InnerText;
 
             SortOrder s = GetSortOrder(configNode);
 
-            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(template, "Template");
+            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(itemKey, "Item Key");
+            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(folderKey, "Folder Key");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(folderTemplate, "FolderTemplate");
 
             var sortFields = new string[] { };
@@ -60,31 +62,32 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
             }
 
 
-            return new AlphaMoverConfiguration(database, template, branch, s, folderTemplate, sortFields);
+            return new AlphaMoverConfiguration(database, itemKey, folderKey, s, folderTemplate, sortFields);
         }
 
         private static DateMoverConfiguration CreateDateBased(Database database, XmlNode configNode)
         {
-            string template = configNode.Attributes["id"].Value;
-            string branch = configNode.Attributes["branch"]?.Value ?? string.Empty;
+            string itemKey = configNode.Attributes["itemKey"].Value;
+            string folderKey = configNode.Attributes["folderKey"].Value;
             string yearTemplate = configNode["YearTemplate"].InnerText;
             string yearFormat = configNode["YearTemplate"].GetAttributeWithDefault("formatString", null);
             string monthTemplate = null, monthFormat = null;
             string dayTemplate = null, dayFormat = null;
             string dateField = configNode["DateField"].InnerText;
 
-            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(template, "Template");
+            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(itemKey, "Item Key");
+            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(folderKey, "Folder Key");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(yearTemplate, "YearTemplate");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(dateField, "DateField");
 
             // make sure we have the template of the items we want to move
-            TemplateItem templateItem = database.Templates[template];
+            //TemplateItem templateItem = database.Templates[itemKey];
 
-            if (templateItem == null)
-            {
-                Sitecore.Diagnostics.Log.Warn(string.Format("Template '{0}' not found.", template), configNode);
-                return null;
-            }
+            //if (templateItem == null)
+            //{
+            //    Sitecore.Diagnostics.Log.Warn($"Template for '{itemKey}' not found.", configNode);
+            //    return null;
+            //}
 
             if (configNode["MonthTemplate"] != null)
             {
@@ -100,7 +103,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
 
             SortOrder s = GetSortOrder(configNode);
 
-            return CreateDateBased(database, template, branch, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
+            return CreateDateBased(database, itemKey, folderKey, dateField, yearTemplate, monthTemplate, dayTemplate, s, yearFormat, monthFormat, dayFormat);
         }
 
         private static SortOrder GetSortOrder(XmlNode configNode)
@@ -115,21 +118,51 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
             return s;
         }
 
-        public static DateMoverConfiguration CreateDateBased(Database database, string template, string branch, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
+        public static DateMoverConfiguration CreateDateBased(Database database, string itemKey, string folderKey, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, SortOrder sort, string yearFormat = null, string monthFormat = null, string dayFormat = null)
         {
             var msg = string.Empty;
 
-            if (database.Templates[template] == null)
-                msg += "Template does not exist: " + template + "\n";
+            if (!string.IsNullOrEmpty(yearTemplate))
+            {
+                if (Regex.IsMatch(yearTemplate, @"Branches/", RegexOptions.IgnoreCase))
+                {
+                    if (database.Branches[yearTemplate] == null)
+                        msg += "Year BRANCH template does not exist: " + yearTemplate + "\n";
+                }
+                else
+                {
+                    if (database.Templates[yearTemplate] == null)
+                        msg += "Year REGULAR template does not exist: " + yearTemplate + "\n";
+                }
+            }
 
-            if (!string.IsNullOrEmpty(yearTemplate) && database.Templates[yearTemplate] == null)
-                msg += "Year template does not exist: " + yearTemplate + "\n";
+            if (!string.IsNullOrEmpty(monthTemplate))
+            {
+                if (Regex.IsMatch(monthTemplate, @"Branches/", RegexOptions.IgnoreCase))
+                {
+                    if (database.Branches[monthTemplate] == null)
+                        msg += "Year BRANCH template does not exist: " + monthTemplate + "\n";
+                }
+                else
+                {
+                    if (database.Templates[monthTemplate] == null)
+                        msg += "Year REGULAR template does not exist: " + monthTemplate + "\n";
+                }
+            }
 
-            if (!string.IsNullOrEmpty(monthTemplate) && database.Templates[monthTemplate] == null)
-                msg += "Month template does not exist: " + monthTemplate + "\n";
-
-            if (!string.IsNullOrEmpty(dayTemplate) && database.Templates[dayTemplate] == null)
-                msg += "Day template does not exist: " + dayTemplate + "\n";
+            if (!string.IsNullOrEmpty(dayTemplate))
+            {
+                if (Regex.IsMatch(dayTemplate, @"Branches/", RegexOptions.IgnoreCase))
+                {
+                    if (database.Branches[dayTemplate] == null)
+                        msg += "Year BRANCH template does not exist: " + dayTemplate + "\n";
+                }
+                else
+                {
+                    if (database.Templates[dayTemplate] == null)
+                        msg += "Year REGULAR template does not exist: " + dayTemplate + "\n";
+                }
+            }
 
             if (!string.IsNullOrEmpty(msg))
             {
@@ -137,7 +170,7 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
                 return null;
             }
 
-            return new DateMoverConfiguration(database, template, branch, sort, dateField, yearTemplate, monthTemplate, dayTemplate, yearFormat, monthFormat, dayFormat);
+            return new DateMoverConfiguration(database, itemKey, folderKey, sort, dateField, yearTemplate, monthTemplate, dayTemplate, yearFormat, monthFormat, dayFormat);
         }
     }
 }

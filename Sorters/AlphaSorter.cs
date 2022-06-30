@@ -18,7 +18,7 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
         protected override Item CreateFolders(Item item, IMoverConfiguration config)
         {
             var c = (AlphaMoverConfiguration)config;
-            var itemName = item.Name;
+            //var itemName = item.Name;
             var root = GetRootItem(item, c);
 
             root = GetOrCreateChild(root, c.FolderTemplate, GetName(item, c), c.SortOrder);
@@ -81,10 +81,13 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
         /// <returns></returns>
         protected Item GetOrCreateChild(Item parent, TemplateItem template, string childName, SortOrder subItemSorting)
         {
+            bool publishChild = false;
+
             Item child = parent.Children[childName];
             if (child == null)
             {
                 child = parent.Add(childName, template);
+                publishChild = true;
             }
 
             var sortValue = Constants.SortOrderValueIDs[subItemSorting].ToString();
@@ -97,6 +100,12 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
                     child.Fields[FieldIDs.SubitemsSorting].Value = sortValue;
                 }
                 Sorting.SortReset(parent);
+                publishChild = true;
+            }
+
+            if (publishChild)
+            {
+                PublishNewItem(child);
             }
 
             return child;

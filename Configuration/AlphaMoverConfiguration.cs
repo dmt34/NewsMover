@@ -28,18 +28,14 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         /// Initializes a new instance of the <see cref="TemplateConfiguration"/> class.
         /// </summary>
         /// <param name="database">The database.</param>
-        /// <param name="template">The target item template.</param>
-        /// <param name="branch">The target item branch template.</param>
+        /// <param name="itemKey">The target item id string.</param>
+        /// <param name="folderKey">Id string for folders.</param>
         /// <param name="dateField">The date field.</param>
-        /// <param name="yearTemplate">The year template.</param>
-        /// <param name="monthTemplate">The month template.</param>
-        /// <param name="dayTemplate">The day template.</param>
         /// <param name="sort">The sort.</param>
-        /// <param name="yearFormat">The year format.</param>
-        /// <param name="monthFormat">The month format.</param>
-        /// <param name="dayFormat">The day format.</param>
-        internal AlphaMoverConfiguration(Database database, string template, string branch, SortOrder sort, string folderTemplate, string[] sortFields)
-            : base (database, template, branch, sort)
+        /// <param name="folderTemplate">The folder template type.</param>
+        /// <param name="sortFields">Field names for alpha sorting</param>
+        internal AlphaMoverConfiguration(Database database, string itemKey, string folderKey, SortOrder sort, string folderTemplate, string[] sortFields)
+            : base (database, itemKey, folderKey, sort)
         {
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(folderTemplate, "FolderTemplate");
 

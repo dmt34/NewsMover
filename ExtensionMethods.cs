@@ -12,7 +12,9 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
+using Sitecore.Data;
 using Sitecore.Data.Items;
 
 namespace Sitecore.Sharedsource.NewsMover
@@ -70,50 +72,72 @@ namespace Sitecore.Sharedsource.NewsMover
         }
 
         /// <summary>
-        ///   Produces a dictionary key for checking managed items.
+        ///   Returns the dictionary key for checking managed items.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns>
-        ///   templateid + [optional] branchid
+        ///   string value of target item's "News Mover Id" field
         /// </returns>
         /// <remarks>
-        ///   compare with output of BaseMoverConfiguration.GetItemKey()
+        ///   - compare with "itemKey" attribute of managed items in NewsMover.config
+        ///   - if item is null or item key is empty, return a non-null, non-empty string (guaranteed to not match)
         /// </remarks>
         public static string ItemKey(this Item item)
         {
             if (item == null)
-                return "";
+                return Constants.NotManagedKey;
 
-            string key = item.TemplateID.ToShortID().ToString().ToLower();
+            string key = item[Constants.NewsMoverTargetIdField];
             
-            if (!Sitecore.Data.ID.IsNullOrEmpty(item.BranchId))
-                key += item.BranchId.ToShortID().ToString().ToLower();
+            if (string.IsNullOrEmpty(key))
+                return Constants.NotManagedKey;
 
             return key;
         }
-    }
 
-    internal static class EnumExtensions
-    {
         /// <summary>
-        /// Gets the value of the description attribute from the enum
+        ///   Returns a string for identifying years, months, days, alpha folders
         /// </summary>
-        /// <param name="en"></param>
-        /// <returns></returns>
-        public static string ToDescription(this Enum en)
+        /// <param name="item">The item.</param>
+        /// <returns>
+        ///   string value of item's "Folder Id" field
+        /// </returns>
+        /// <remarks>
+        ///   - compare with "folderKey" attribute of managed items in NewsMover.config
+        ///   - if item is null or item key is empty, return empty string
+        /// </remarks>
+
+        public static string FolderKey(this Item item)
         {
-            Type type = en.GetType();
-            MemberInfo[] memInfo = type.GetMember(en.ToString());
-            if (memInfo != null && memInfo.Length > 0)
-            {
-                object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-                if (attrs != null && attrs.Length > 0)
-                {
-                    return ((DescriptionAttribute)attrs[0]).Description;
-                }
-            }
-            return en.ToString();
+            if (item == null)
+                return "";
+
+            string folderkey = item[Constants.NewsMoverFolderIdField];
+
+            if (string.IsNullOrEmpty(folderkey))
+                return "";
+
+            return folderkey;
         }
 
+        public static Item MakeChild(this Item parent, Database db, string name, string tpath)
+        {
+            if (Regex.IsMatch(tpath, @"Branches/", RegexOptions.IgnoreCase))
+            {
+                var branchItem = db.Branches[tpath];
+                string bname = branchItem.Name;
+                Sitecore.Diagnostics.Log.Warn($"MakeChild: BRANCH Path={tpath}...name={bname}...", typeof(ItemExtensions));
+                Item child = parent.Add(name, branchItem);
+                return child;
+            }
+            else
+            {
+                var templateItem = db.Templates[tpath];
+                string tname = templateItem.Name;
+                Sitecore.Diagnostics.Log.Warn($"MakeChild: TEMPLATE Path={tpath}...name={tname}...", typeof(ItemExtensions));
+                Item child = parent.Add(name, templateItem);
+                return child;
+            }
+        }
     }
 }

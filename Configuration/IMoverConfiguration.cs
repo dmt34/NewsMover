@@ -17,5 +17,6 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
     {
         SortOrder SortOrder { get; }
         string ItemKey { get; }
+        string FolderKey { get; }
     }
 }

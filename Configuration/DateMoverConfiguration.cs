@@ -45,18 +45,18 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         /// Initializes a new instance of the <see cref="TemplateConfiguration"/> class.
         /// </summary>
         /// <param name="database">The database.</param>
-        /// <param name="template">The target item template.</param>
-        /// <param name="branch">The target item branch template.</param>
+        /// <param name="itemKey">The target item id string.</param>
+        /// <param name="folderKey">Id string for years, months, days.</param>
+        /// <param name="sort">The sort.</param>
         /// <param name="dateField">The date field.</param>
         /// <param name="yearTemplate">The year template.</param>
         /// <param name="monthTemplate">The month template.</param>
         /// <param name="dayTemplate">The day template.</param>
-        /// <param name="sort">The sort.</param>
         /// <param name="yearFormat">The year format.</param>
         /// <param name="monthFormat">The month format.</param>
         /// <param name="dayFormat">The day format.</param>
-        internal DateMoverConfiguration(Database database, string template, string branch, SortOrder sort, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, string yearFormat = null, string monthFormat = null, string dayFormat = null)
-            : base (database, template, branch, sort)
+        internal DateMoverConfiguration(Database database, string itemKey, string folderKey, SortOrder sort, string dateField, string yearTemplate, string monthTemplate, string dayTemplate, string yearFormat = null, string monthFormat = null, string dayFormat = null)
+            : base (database, itemKey, folderKey, sort)
         {
 
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(dateField, "DateField");
@@ -79,18 +79,18 @@ namespace Sitecore.Sharedsource.NewsMover.Configuration
         private void CreateFolders()
         {
             // we at least need a year template
-            YearFolder = new Folder(Database.Templates[_yearTemplate], _yearFormat);
+            YearFolder = new Folder(_yearTemplate, _yearFormat);
 
             // we may want to organize in months too
             if (!string.IsNullOrEmpty(_monthTemplate))
             {
-                MonthFolder = new Folder(Database.Templates[_monthTemplate], _monthFormat);
+                MonthFolder = new Folder(_monthTemplate, _monthFormat);
             }
 
             // we may also want to put in day folders
             if (!string.IsNullOrEmpty(_dayTemplate))
             {
-                DayFolder = new Folder(Database.Templates[_dayTemplate], _dayFormat);
+                DayFolder = new Folder(_dayTemplate, _dayFormat);
             }
 
             // make sure we have a Month if we have a Day

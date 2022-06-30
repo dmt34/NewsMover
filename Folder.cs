@@ -19,7 +19,9 @@ namespace Sitecore.Sharedsource.NewsMover
         /// <summary>
         /// Gets the template to use for the item.
         /// </summary>
-        public TemplateItem Template { get; private set; }
+
+        //public TemplateItem Template { get; private set; }
+        public string TemplatePath { get; private set; }
 
         /// <summary>
         /// Gets the format string to apply on the date to determine the name of the item.
@@ -29,22 +31,20 @@ namespace Sitecore.Sharedsource.NewsMover
         /// <summary>
         /// Initializes a new instance of the <see cref="Folder"/> class.
         /// </summary>
-        /// <param name="templateItem">The template item.</param>
+        /// <param name="templatePath">The template path string.</param>
         /// <param name="format">The format.</param>
-        public Folder(TemplateItem templateItem, string format)
+        public Folder(string templatePath, string format)
         {
-            Sitecore.Diagnostics.Assert.IsNotNull(templateItem, "templateItem");
+            Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(templatePath, "Template Path");
             Sitecore.Diagnostics.Assert.IsNotNullOrEmpty(format, "format");
 
-            Template = templateItem;
+            TemplatePath = templatePath;
             FormatString = format;
         }
 
         /// <summary>
         /// Gets the name of the folder.
         /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns></returns>
         public string GetName(DateTime date)
         {
             return date.ToString(FormatString);

@@ -11,16 +11,13 @@
 
 namespace Sitecore.Sharedsource.NewsMover.Sorters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Xml;
-    using Sitecore.Configuration;
-    using Sitecore.Data;
     using Sitecore.Data.Items;
-    using Sitecore.Diagnostics;
     using Sitecore.Pipelines;
+    using Sitecore.Publishing;
     using Sitecore.Sharedsource.NewsMover.Configuration;
     using Sitecore.Sharedsource.NewsMover.Pipelines;
+    using System;
+    using System.Collections.Generic;
 
     public abstract class BaseSorter : ISorter
     {
@@ -58,12 +55,37 @@ namespace Sitecore.Sharedsource.NewsMover.Sorters
 
             if ((!Sitecore.Context.IsBackgroundThread) && Sitecore.Context.ClientPage.IsEvent)
             {
-                var args = new MoveCompletedArgs() { Article = item, Root = item.Database.GetRootItem() };
+                var args = new MoveCompletedArgs() {
+                    Article = item,
+                    Root = item.Database.GetRootItem()
+                };
                 CorePipeline.Run("NewsMover.MoveCompleted", args);
             }
+        } 
+
+        public void PublishNewItem(Item item)
+        {
+            // if there is a workflow, set the workflow state to the final state
+            var itemWorkflow = item.Fields[FieldIDs.Workflow]?.Value;
+            if (itemWorkflow == Constants.FolderWorkflowId)
+            {
+                using (new Sitecore.Data.Items.EditContext(item))
+                {
+                    item.Fields[FieldIDs.WorkflowState].Value = Constants.FolderFinalWorkflowState;
+                }
+            }
+
+            // send to web db
+            var web = Sitecore.Configuration.Factory.GetDatabase("web");
+            var master = Sitecore.Configuration.Factory.GetDatabase("master");
+
+            Sitecore.Data.Database[] targets = { web };
+            Sitecore.Globalization.Language[] languages = master.Languages;
+            bool deep = false;
+            bool smart = true;
+            PublishManager.PublishItem(item, targets, languages, deep, smart);
         }
 
-        
         /// <summary>
         /// Creates necessary folders
         /// </summary>

@@ -49,7 +49,7 @@
 
             // Assign each news item an explicit sortorder
             var sign = c.SortOrder == SortOrder.Descending ? "-" : string.Empty;
-            string text = sign + DateUtil.ToIsoDate(articleDate).Substring(4).Replace("T", string.Empty);
+            string text = sign + DateUtil.ToIsoDate(articleDate).Substring(4,9).Replace("T", string.Empty);   // skip year, so: MMddThhmm
             if (item[FieldIDs.Sortorder] != text)
             {
                 using (new EditContext(item))
@@ -61,16 +61,16 @@
             Item root = GetRoot(item, c);
 
             // get/create the year folder
-            root = GetOrCreateChild(root, c.YearFolder.Template, c.YearFolder.GetName(articleDate), config.SortOrder, articleDate.Year);
+            root = GetOrCreateChild(root, c.Database, c.YearFolder.TemplatePath, c.YearFolder.GetName(articleDate), config.SortOrder, articleDate.Year);
 
             // get/create any month -> day structure we need
             if (c.MonthFolder != null)
             {
-                root = GetOrCreateChild(root, c.MonthFolder.Template, c.MonthFolder.GetName(articleDate), config.SortOrder, articleDate.Month);
+                root = GetOrCreateChild(root, c.Database, c.MonthFolder.TemplatePath, c.MonthFolder.GetName(articleDate), config.SortOrder, articleDate.Month);
 
                 if (c.DayFolder != null)
                 {
-                    root = GetOrCreateChild(root, c.DayFolder.Template, c.DayFolder.GetName(articleDate), config.SortOrder, articleDate.Day);
+                    root = GetOrCreateChild(root, c.Database, c.DayFolder.TemplatePath, c.DayFolder.GetName(articleDate), config.SortOrder, articleDate.Day);
                 }
             }
 
@@ -96,22 +96,31 @@
             return parent;
         }
 
-
-
         /// <summary>
         /// Determines whether the item is a year, month or day item.
         /// </summary>
         /// <param name="item">The item.</param>
         /// <param name="config">The config.</param>
         /// <returns>
-        ///   <c>true</c> if [is item year month or day] [the specified item]; otherwise, <c>false</c>.
+        ///   <c>true</c> if item has a non-empty value of "Folder Id" else <c>false</c>.
         /// </returns>
+        /// <remarks>
+        ///   bonus points if the item folder id matches the folderKey of some config in NewsMover.config
+        /// </remarks>
         protected override bool IsMoverFolderItem(Item item, IMoverConfiguration config)
         {
             var c = (DateMoverConfiguration)config;
-            return item.TemplateID == c.YearFolder.Template.ID
-                    || (c.MonthFolder != null && item.TemplateID == c.MonthFolder.Template.ID)
-                    || (c.DayFolder != null && item.TemplateID == c.DayFolder.Template.ID);
+
+            string itemFolderKey = item.FolderKey();
+            string configFolderKey = c.FolderKey;
+
+            if (string.IsNullOrEmpty(itemFolderKey))
+                return false;
+
+            if (itemFolderKey != configFolderKey)
+                Sitecore.Diagnostics.Log.Warn($"folderkeys do not match i={itemFolderKey}, c={configFolderKey}.", this);
+
+            return true;
         }
 
         /// <summary>
@@ -121,12 +130,15 @@
         /// <param name="childName">Name of the child.</param>
         /// <param name="template">The template.</param>
         /// <returns></returns>
-        protected Item GetOrCreateChild(Item parent, TemplateItem template, string childName, SortOrder sortOrder, int sortIndex)
+        protected Item GetOrCreateChild(Item parent, Database db, string templatePath, string childName, SortOrder sortOrder, int sortIndex)
         {
+            bool publishChild = false;
+
             Item child = parent.Children[childName];
             if (child == null)
             {
-                child = parent.Add(childName, template);
+                child = parent.MakeChild(db, childName, templatePath);
+                publishChild = true;
             }
 
             if (sortOrder == SortOrder.Descending)
@@ -141,6 +153,12 @@
                 {
                     child.Fields[FieldIDs.Sortorder].Value = sortValue;
                 }
+                publishChild = true;
+            }
+
+            if (publishChild)
+            {
+                PublishNewItem(child);
             }
 
             return child;
