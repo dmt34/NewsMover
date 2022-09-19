@@ -3,7 +3,7 @@
     <metadata>
       <PackageName>NewsMover</PackageName>
       <Author>Sitecore Shared Source</Author>
-      <Version>2.3</Version>
+      <Version>2.4</Version>
       <Revision />
       <License>&lt;a href="http://sdn.sitecore.net/resources/shared%20source/shared%20source%20license.aspx"&gt;http://sdn.sitecore.net/resources/shared%20source/shared%20source%20license.aspx&lt;/a&gt;</License>
       <Comment />
@@ -18,7 +18,6 @@
   <Sources>
     <xfiles>
       <Entries>
-        <x-item>/App_Config/Include/NewsMover.config</x-item>
         <x-item>/bin/Sitecore.Sharedsource.NewsMover.dll</x-item>
       </Entries>
       <Converter>
